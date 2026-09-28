@@ -1,0 +1,11 @@
+backend/.venv/
+__pycache__/
+*.pyc
+backend/*.log
+runtime/
+.pytest_cache/
+*.zip
+*.safetensors
+*.bin
+training/**/__pycache__/
+validation_inputs/

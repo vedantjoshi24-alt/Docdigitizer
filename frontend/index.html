@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DocDigitize · Local document clone</title>
+  <style>
+    :root{color-scheme:light;--ink:#14221d;--muted:#617068;--paper:#fbfaf5;--surface:#fff;--line:#dce2dc;--brand:#176b4b;--brand2:#0b4b35;--likely:#248a61;--check:#d88916;--missed:#c7463a;--verified:#2867b2;--shadow:0 18px 50px #17322614}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f1f3ee;color:var(--ink);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}
+    header{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 30px;background:#fcfcf9;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}.brand{display:flex;gap:11px;align-items:center;font-weight:780;font-size:19px}.mark{width:34px;height:38px;background:var(--brand);border-radius:5px 5px 10px 5px;position:relative;box-shadow:inset -7px 0 #fff2}.mark:after{content:"";position:absolute;left:8px;top:10px;width:15px;height:2px;background:white;box-shadow:0 6px white,0 12px white}.local{font-size:12px;font-weight:700;color:var(--brand);background:#e7f3ec;border:1px solid #b9d8c8;padding:5px 9px;border-radius:99px}.save-state{font-size:13px;color:var(--muted)}
+    main{max-width:1540px;margin:auto;padding:24px}.card{background:var(--surface);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}
+    #start{max-width:880px;margin:42px auto;padding:36px}.eyebrow{text-transform:uppercase;letter-spacing:.14em;color:var(--brand);font-weight:800;font-size:11px}.hero h1{font:700 clamp(34px,6vw,62px)/1.04 Georgia,serif;letter-spacing:-.035em;margin:10px 0 15px;max-width:760px}.hero p{color:var(--muted);font-size:17px;max-width:680px;margin:0 0 28px}.privacy{display:flex;gap:9px;align-items:center;color:var(--brand2);font-weight:650;margin-bottom:22px}.privacy:before{content:"●";font-size:9px}
+    #drop{border:1.5px dashed #9faf9f;border-radius:13px;min-height:205px;display:grid;place-items:center;text-align:center;padding:28px;background:#fafbf7;transition:.2s}.drop-inner strong{font-size:18px}.drop-inner span{display:block;color:var(--muted);margin:7px 0 17px}.drop-icon{font-size:32px;color:var(--brand);margin-bottom:7px}#drop.hover{border-color:var(--brand);background:#eff8f2}.primary,.secondary,.quiet{border:0;border-radius:9px;padding:10px 15px;font-weight:750}.primary{background:var(--brand);color:white}.primary:hover{background:var(--brand2)}.primary:disabled{opacity:.48;cursor:wait}.secondary{background:#e8efe9;color:var(--brand2)}.quiet{background:transparent;color:var(--muted);padding:7px 9px}.quiet:hover{background:#edf0eb;color:var(--ink)}
+    #file-ready{display:none;align-items:center;justify-content:space-between;gap:15px;margin-top:15px;padding:13px 15px;background:#eff6f1;border-radius:10px}.filename{font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.filesize{font-size:12px;color:var(--muted)}#start-status{margin:16px 0 0;color:var(--muted);min-height:22px}.error{color:var(--missed)!important}
+    #workspace{display:none}.summarybar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}.docname{font-weight:800;margin-right:auto;max-width:390px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.metric{border:1px solid var(--line);border-radius:9px;padding:7px 10px;background:white;font-size:13px}.metric strong{font-size:16px;margin-right:4px}.metric.warn strong{color:var(--check)}.exports{display:flex;gap:7px;flex-wrap:wrap}.export{background:white;border:1px solid var(--line);padding:8px 11px;border-radius:8px;font-weight:700;color:var(--ink)}
+    .workgrid{display:grid;grid-template-columns:minmax(420px,1.08fr) minmax(390px,.92fr);gap:18px;align-items:start}.viewer,.editor{min-width:0}.viewer{position:sticky;top:86px;overflow:hidden}.viewer-head,.editor-head{padding:13px 15px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;min-height:58px}.viewer-head strong,.editor-head strong{margin-right:auto}.page-controls{display:flex;align-items:center;gap:6px}.page-controls button{border:1px solid var(--line);background:white;border-radius:7px;width:31px;height:31px}.page-controls button:disabled{opacity:.4}.draw-toggle.active{background:#fff0d2;color:#8a5700}.viewer-body{padding:16px;background:#e4e7e1;max-height:calc(100vh - 162px);overflow:auto}.page-stage{position:relative;margin:auto;background:white;box-shadow:0 7px 28px #26342c2b;line-height:0;user-select:none}.page-stage img{display:block;width:100%;height:auto}.overlay{position:absolute;inset:0;line-height:normal}.overlay.draw{cursor:crosshair}.ocr-box{position:absolute;border:2px solid var(--likely);background:#37a47512;border-radius:3px;min-width:5px;min-height:5px;pointer-events:auto}.ocr-box.check{border-color:var(--check);background:#f2a72b18}.ocr-box.missed{border-color:var(--missed);background:#e4584c18;border-style:dashed}.ocr-box.reviewed{border-color:var(--verified);background:#3479ca18}.ocr-box.active{outline:3px solid #101d18;outline-offset:2px;z-index:4}.draw-preview{position:absolute;border:2px dashed var(--brand);background:#2c9a6820;pointer-events:none}
+    .legend{padding:10px 15px;background:white;border-top:1px solid var(--line);display:flex;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:12px}.dot:before{content:"";display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--likely);margin-right:5px}.dot.check:before{background:var(--check)}.dot.missed:before{background:var(--missed)}.dot.reviewed:before{background:var(--verified)}
+    .editor{overflow:hidden}.editor-head{flex-wrap:wrap}.filter{border:1px solid var(--line);background:white;border-radius:99px;padding:6px 10px;color:var(--muted);font-weight:700;font-size:12px}.filter.active{background:var(--ink);color:white;border-color:var(--ink)}.quality{margin:13px 15px 0;padding:11px 13px;border-radius:9px;background:#fff5da;color:#755216;font-size:13px}.quality:empty{display:none}.transcript{padding:12px;max-height:calc(100vh - 185px);overflow:auto}.empty{padding:30px;text-align:center;color:var(--muted)}
+    .line-card{border:1px solid var(--line);border-left:4px solid var(--likely);border-radius:10px;margin-bottom:9px;background:#fff;padding:10px;scroll-margin-top:110px}.line-card.check{border-left-color:var(--check)}.line-card.missed{border-left-color:var(--missed);background:#fffdf9}.line-card.reviewed{border-left-color:var(--verified)}.line-card.active{box-shadow:0 0 0 2px #20322b}.line-meta{display:flex;align-items:center;gap:7px;margin-bottom:8px}.badge{font-weight:800;font-size:10px;text-transform:uppercase;letter-spacing:.07em;border-radius:99px;padding:3px 7px;background:#e5f4eb;color:#176542}.badge.check{background:#fff0d2;color:#855300}.badge.missed{background:#fce3df;color:#a62f27}.badge.reviewed{background:#e2edfa;color:#235995}.score{color:var(--muted);font-size:12px}.line-tools{display:flex;margin-left:auto;gap:3px}.line-tools button{border:0;background:transparent;color:var(--muted);border-radius:5px;padding:4px 7px}.line-tools button:hover{background:#edf0eb;color:var(--ink)}textarea.line-text{width:100%;resize:vertical;min-height:48px;border:1px solid #cad3cb;border-radius:7px;padding:8px 9px;color:var(--ink);background:#fff;font:15px/1.35 ui-monospace,SFMono-Regular,Consolas,monospace}textarea.line-text:focus{outline:2px solid #8bb8a3;border-color:transparent}.reason{font-size:12px;color:#826020;margin:7px 0 0}.alternatives{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:7px;font-size:12px;color:var(--muted)}.alternative{border:1px solid #dfc88c;background:#fff9e9;border-radius:6px;padding:3px 6px;cursor:pointer}.review-actions{display:flex;gap:7px;margin-top:8px}.mini{border:1px solid var(--line);background:white;border-radius:7px;padding:5px 8px;font-weight:700;font-size:12px}.mini.verified{color:var(--verified);border-color:#a8c3e3}.backend-note{font-size:12px;color:var(--muted);margin-top:15px}
+    .toast{position:fixed;right:22px;bottom:22px;background:#16231e;color:white;padding:11px 15px;border-radius:9px;box-shadow:var(--shadow);z-index:100;opacity:0;transform:translateY(10px);pointer-events:none;transition:.2s}.toast.show{opacity:1;transform:none}
+    @media(max-width:950px){header{padding:0 16px}main{padding:15px}.workgrid{grid-template-columns:1fr}.viewer{position:relative;top:0}.viewer-body{max-height:none}.transcript{max-height:none}.summarybar{align-items:stretch}.docname{width:100%;max-width:none}.exports{width:100%}}
+  </style>
+</head>
+<body>
+<header><div class="brand"><span class="mark"></span>DocDigitize <span class="local"></span></div><div id="save-state" class="save-state">No document open</div></header>
+<main>
+  <section id="start" class="card hero">
+    <div class="eyebrow">Page-faithful English OCR</div>
+    <h1>Turn a document photo into a reviewable digital copy.</h1>
+    <p>Printed, handwritten, or mixed. Every result stays linked to its place on the source page, and uncertain or possibly missed content is shown for review.</p>
+    <div class="privacy">Runs on this computer. Documents are not uploaded to a cloud service.</div>
+    <div id="drop"><div class="drop-inner"><div class="drop-icon">⇧</div><strong>Drop a document here</strong><span>PNG, JPG, WEBP, or PDF · up to 20 MB · PDF up to 12 pages</span><button id="choose" class="secondary" type="button">Choose document</button></div></div>
+    <input id="file" type="file" accept="image/*,application/pdf,.pdf" hidden>
+    <div id="file-ready"><div><div id="filename" class="filename"></div><div id="filesize" class="filesize"></div></div><button id="run" class="primary" type="button">Create digital copy</button></div>
+    <p id="start-status"></p>
+    <p class="backend-note">The first run downloads free OCR model files and can take several minutes. Later runs use the local cache.</p>
+  </section>
+
+  <section id="workspace">
+    <div class="summarybar">
+      <div id="docname" class="docname"></div>
+      <div class="metric"><strong id="count-blocks">0</strong> text areas</div>
+      <div class="metric warn"><strong id="count-review">0</strong> need review</div>
+      <div class="metric"><strong id="count-verified">0</strong> reviewed</div>
+      <div class="exports"><button class="export" data-export="pdf">Searchable PDF</button><button class="export" data-export="txt">TXT</button><button class="export" data-export="html">HTML</button><button class="export" data-export="json">JSON</button><button id="new-doc" class="quiet">New document</button></div>
+    </div>
+    <div class="workgrid">
+      <section class="viewer card">
+        <div class="viewer-head"><strong>Source page</strong><button id="draw-toggle" class="secondary draw-toggle">＋ Add missed text</button><div class="page-controls"><button id="prev-page" aria-label="Previous page">‹</button><span id="page-label">Page 1 of 1</span><button id="next-page" aria-label="Next page">›</button></div></div>
+        <div class="viewer-body"><div id="page-stage" class="page-stage"><img id="page-image" alt="Source document page"><div id="overlay" class="overlay"></div></div></div>
+        <div class="legend"><span class="dot">Likely</span><span class="dot check">Check</span><span class="dot missed">Possible missed text</span><span class="dot reviewed">Reviewed</span></div>
+      </section>
+      <section class="editor card">
+        <div class="editor-head"><strong>Transcript</strong><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="review">Needs review</button><button class="filter" data-filter="missed">Possibly missed</button></div>
+        <div id="quality" class="quality"></div>
+        <div id="transcript" class="transcript"></div>
+      </section>
+    </div>
+  </section>
+</main>
+<div id="toast" class="toast"></div>
+<script>
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => [...document.querySelectorAll(selector)];
+  let selectedFile = null, job = null, pageIndex = 0, activeId = null, filter = 'all', drawMode = false, drawStart = null, saveTimer = null;
+
+  const drop = $('#drop'), fileInput = $('#file');
+  $('#choose').onclick = event => { event.stopPropagation(); fileInput.click(); };
+  drop.onclick = () => fileInput.click();
+  fileInput.onchange = () => selectFile(fileInput.files[0]);
+  drop.ondragover = event => { event.preventDefault(); drop.classList.add('hover'); };
+  drop.ondragleave = () => drop.classList.remove('hover');
+  drop.ondrop = event => { event.preventDefault(); drop.classList.remove('hover'); selectFile(event.dataTransfer.files[0]); };
+
+  function selectFile(file) {
+    if (!file) return;
+    const valid = file.type.startsWith('image/') || file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+    if (!valid) return setStartStatus('Choose an image or PDF document.', true);
+    if (file.size > 20 * 1024 * 1024) return setStartStatus('The upload limit is 20 MB.', true);
+    selectedFile = file;
+    $('#filename').textContent = file.name;
+    $('#filesize').textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB · ready for local processing`;
+    $('#file-ready').style.display = 'flex';
+    setStartStatus('');
+  }
+  function setStartStatus(text, error=false) { $('#start-status').textContent = text; $('#start-status').className = error ? 'error' : ''; }
+
+  $('#run').onclick = async () => {
+    if (!selectedFile) return;
+    const button = $('#run'); button.disabled = true;
+    setStartStatus('Reading the document locally. The first run may download OCR models…');
+    const form = new FormData(); form.append('file', selectedFile);
+    try {
+      const response = await fetch('/api/digitize', {method:'POST', body:form});
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.detail || `Request failed (${response.status})`);
+      job = payload; pageIndex = 0; activeId = null;
+      $('#start').style.display = 'none'; $('#workspace').style.display = 'block';
+      render();
+      $('#save-state').textContent = job.backend_warning || `OCR: ${job.ocr_backend || 'local engine'} · saved locally`;
+    } catch (error) { setStartStatus(error.message, true); }
+    finally { button.disabled = false; }
+  };
+
+  function currentPage() { return job.pages[pageIndex]; }
+  function blockAppearance(block) {
+    if (['verified','corrected'].includes(block.review_state)) return 'reviewed';
+    return block.status;
+  }
+  function needsReview(block) { return !['verified','corrected'].includes(block.review_state) && ['check','missed'].includes(block.status); }
+  function visibleBlocks() {
+    const blocks = currentPage().blocks;
+    if (filter === 'review') return blocks.filter(needsReview);
+    if (filter === 'missed') return blocks.filter(block => block.status === 'missed' && !['verified','corrected'].includes(block.review_state));
+    return blocks;
+  }
+
+  function render() {
+    const page = currentPage();
+    $('#docname').textContent = job.filename;
+    $('#page-label').textContent = `Page ${page.page_number} of ${job.pages.length}`;
+    $('#prev-page').disabled = pageIndex === 0; $('#next-page').disabled = pageIndex === job.pages.length - 1;
+    $('#page-image').src = `/api/jobs/${job.job_id}/pages/${page.page_number}.png`;
+    const warnings = [...(page.warnings || [])];
+    if (job.backend_warning && pageIndex === 0) warnings.unshift(job.backend_warning);
+    $('#quality').textContent = warnings.join(' ');
+    renderOverlay(); renderTranscript(); renderSummary();
+  }
+
+  function renderOverlay() {
+    const page = currentPage(), overlay = $('#overlay'); overlay.replaceChildren();
+    for (const block of page.blocks) {
+      const box = document.createElement('button');
+      box.className = `ocr-box ${blockAppearance(block)}${block.id === activeId ? ' active' : ''}`;
+      box.style.left = `${block.box[0] / page.width * 100}%`; box.style.top = `${block.box[1] / page.height * 100}%`;
+      box.style.width = `${(block.box[2]-block.box[0]) / page.width * 100}%`; box.style.height = `${(block.box[3]-block.box[1]) / page.height * 100}%`;
+      box.title = block.text || 'Possible missed text'; box.setAttribute('aria-label', box.title);
+      box.onclick = event => { event.stopPropagation(); selectBlock(block.id, true); };
+      overlay.append(box);
+    }
+    overlay.classList.toggle('draw', drawMode);
+  }
+
+  function renderTranscript() {
+    const target = $('#transcript'); target.replaceChildren();
+    const blocks = visibleBlocks();
+    if (!blocks.length) { const empty=document.createElement('div'); empty.className='empty'; empty.textContent='No text areas match this filter.'; target.append(empty); return; }
+    blocks.forEach((block, visibleIndex) => {
+      const card = document.createElement('article'); const appearance = blockAppearance(block);
+      card.id = `card-${block.id}`; card.className = `line-card ${appearance}${block.id===activeId?' active':''}`;
+      card.onclick = () => selectBlock(block.id, false);
+      const meta = document.createElement('div'); meta.className='line-meta';
+      const badge = document.createElement('span'); badge.className=`badge ${appearance}`;
+      badge.textContent = appearance === 'reviewed' ? block.review_state : block.status === 'missed' ? 'possible missed' : block.status;
+      const score = document.createElement('span'); score.className='score'; score.textContent = block.confidence == null ? '' : `${Math.round(block.confidence*100)}% model score`;
+      const tools = document.createElement('div'); tools.className='line-tools';
+      const up = document.createElement('button'); up.textContent='↑'; up.title='Move earlier'; up.onclick=e=>{e.stopPropagation();moveBlock(block.id,-1)};
+      const down = document.createElement('button'); down.textContent='↓'; down.title='Move later'; down.onclick=e=>{e.stopPropagation();moveBlock(block.id,1)};
+      const remove = document.createElement('button'); remove.textContent='×'; remove.title='Remove region'; remove.onclick=e=>{e.stopPropagation();removeBlock(block.id)};
+      tools.append(up,down,remove); meta.append(badge,score,tools);
+      const area = document.createElement('textarea'); area.className='line-text'; area.value=block.text; area.placeholder=block.status==='missed'?'Type the missing text here, or mark the region as not text…':'Recognized text';
+      area.oninput = () => { block.text=area.value; block.review_state=area.value===block.original_text?'unreviewed':'corrected'; activeId=block.id; scheduleSave(); renderOverlay(); renderSummary(); badge.textContent=block.review_state==='corrected'?'corrected':block.status; badge.className=`badge ${blockAppearance(block)}`; card.className=`line-card ${blockAppearance(block)} active`; };
+      card.append(meta,area);
+      if (block.alternatives?.length) { const alternatives=document.createElement('div'); alternatives.className='alternatives'; alternatives.append('Alternative: '); block.alternatives.forEach(text=>{const choice=document.createElement('button');choice.className='alternative';choice.textContent=text;choice.onclick=e=>{e.stopPropagation();block.text=text;block.review_state='corrected';scheduleSave();render()};alternatives.append(choice)}); card.append(alternatives); }
+      if (block.reasons?.length && needsReview(block)) { const reason=document.createElement('p');reason.className='reason';reason.textContent=block.reasons.join(' ');card.append(reason); }
+      const actions=document.createElement('div');actions.className='review-actions';
+      const verify=document.createElement('button');verify.className='mini verified';verify.textContent=block.review_state==='verified'?'✓ Verified':'Mark verified';verify.onclick=e=>{e.stopPropagation();block.review_state=block.review_state==='verified'?'unreviewed':'verified';scheduleSave();render()};
+      const notText=document.createElement('button');notText.className='mini';notText.textContent='Not text';notText.hidden=block.status!=='missed';notText.onclick=e=>{e.stopPropagation();removeBlock(block.id)};
+      actions.append(verify,notText);card.append(actions);target.append(card);
+    });
+  }
+
+  function renderSummary() {
+    const blocks=job.pages.flatMap(page=>page.blocks), review=blocks.filter(needsReview), reviewed=blocks.filter(block=>['verified','corrected'].includes(block.review_state));
+    $('#count-blocks').textContent=blocks.length;$('#count-review').textContent=review.length;$('#count-verified').textContent=reviewed.length;
+  }
+  function selectBlock(id, scroll) { activeId=id;renderOverlay();renderTranscript();if(scroll) document.getElementById(`card-${id}`)?.scrollIntoView({behavior:'smooth',block:'center'}); }
+  function moveBlock(id, direction) { const blocks=currentPage().blocks,index=blocks.findIndex(item=>item.id===id),next=index+direction;if(index<0||next<0||next>=blocks.length)return;[blocks[index],blocks[next]]=[blocks[next],blocks[index]];scheduleSave();renderTranscript(); }
+  function removeBlock(id) { const blocks=currentPage().blocks,index=blocks.findIndex(item=>item.id===id);if(index<0)return;blocks.splice(index,1);if(activeId===id)activeId=null;scheduleSave();render(); }
+
+  $('#prev-page').onclick=()=>{if(pageIndex>0){pageIndex--;activeId=null;render()}}; $('#next-page').onclick=()=>{if(pageIndex<job.pages.length-1){pageIndex++;activeId=null;render()}};
+  $$('.filter').forEach(button=>button.onclick=()=>{filter=button.dataset.filter;$$('.filter').forEach(item=>item.classList.toggle('active',item===button));renderTranscript()});
+  $('#new-doc').onclick=()=>{job=null;selectedFile=null;fileInput.value='';$('#file-ready').style.display='none';$('#workspace').style.display='none';$('#start').style.display='block';$('#save-state').textContent='No document open';setStartStatus('')};
+
+  $('#draw-toggle').onclick=()=>{drawMode=!drawMode;$('#draw-toggle').classList.toggle('active',drawMode);$('#draw-toggle').textContent=drawMode?'Drag a box on the page':'＋ Add missed text';renderOverlay()};
+  $('#overlay').onpointerdown=event=>{if(!drawMode)return;const rect=$('#overlay').getBoundingClientRect();drawStart={x:Math.max(0,Math.min(rect.width,event.clientX-rect.left)),y:Math.max(0,Math.min(rect.height,event.clientY-rect.top))};const preview=document.createElement('div');preview.id='draw-preview';preview.className='draw-preview';preview.style.left=`${drawStart.x}px`;preview.style.top=`${drawStart.y}px`;$('#overlay').append(preview);event.preventDefault()};
+  $('#overlay').onpointermove=event=>{if(!drawStart)return;const rect=$('#overlay').getBoundingClientRect(),x=Math.max(0,Math.min(rect.width,event.clientX-rect.left)),y=Math.max(0,Math.min(rect.height,event.clientY-rect.top)),preview=$('#draw-preview');preview.style.left=`${Math.min(drawStart.x,x)}px`;preview.style.top=`${Math.min(drawStart.y,y)}px`;preview.style.width=`${Math.abs(x-drawStart.x)}px`;preview.style.height=`${Math.abs(y-drawStart.y)}px`};
+  $('#overlay').onpointerup=event=>{if(!drawStart)return;const rect=$('#overlay').getBoundingClientRect(),x=Math.max(0,Math.min(rect.width,event.clientX-rect.left)),y=Math.max(0,Math.min(rect.height,event.clientY-rect.top)),left=Math.min(drawStart.x,x),top=Math.min(drawStart.y,y),width=Math.abs(x-drawStart.x),height=Math.abs(y-drawStart.y);drawStart=null;if(width<8||height<8){renderOverlay();return}const page=currentPage(),box=[Math.round(left/rect.width*page.width),Math.round(top/rect.height*page.height),Math.round((left+width)/rect.width*page.width),Math.round((top+height)/rect.height*page.height)],id=`p${page.page_number}-manual-${Date.now()}`;page.blocks.push({id,text:'',original_text:'',box,polygon:[[box[0],box[1]],[box[2],box[1]],[box[2],box[3]],[box[0],box[3]]],confidence:null,recognition_confidence:null,detection_confidence:null,status:'missed',reasons:['This region was added manually for transcription.'],alternatives:[],engine:'manual',review_state:'unreviewed',manual:true});activeId=id;drawMode=false;$('#draw-toggle').classList.remove('active');$('#draw-toggle').textContent='＋ Add missed text';scheduleSave();render();setTimeout(()=>document.getElementById(`card-${id}`)?.querySelector('textarea')?.focus(),0)};
+
+  function scheduleSave(){ $('#save-state').textContent='Saving corrections…';clearTimeout(saveTimer);saveTimer=setTimeout(saveNow,650); }
+  async function saveNow(){if(!job)return;clearTimeout(saveTimer);try{const response=await fetch(`/api/jobs/${job.job_id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({pages:job.pages})});const payload=await response.json().catch(()=>({}));if(!response.ok)throw new Error(payload.detail||'Save failed');job={...job,...payload};$('#save-state').textContent='All corrections saved locally';return true}catch(error){$('#save-state').textContent='Corrections are not saved';toast(error.message);return false}}
+  $$('.export').forEach(button=>button.onclick=async()=>{const saved=await saveNow();if(saved!==false)window.location.href=`/api/jobs/${job.job_id}/export/${button.dataset.export}`});
+  function toast(message){const element=$('#toast');element.textContent=message;element.classList.add('show');setTimeout(()=>element.classList.remove('show'),2600)}
+</script>
+</body>
+</html>
